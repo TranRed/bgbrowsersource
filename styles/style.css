@@ -1,0 +1,24 @@
+td {
+    color:white;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size: 26px;
+    width: auto;
+}
+
+#MMR {
+    position: absolute;
+    top:170px;
+    left:2px;
+  }
+
+  #placeHeader {
+    position: absolute;
+    top:250px;
+    left:4px;
+  }
+
+  #placements {
+    position: absolute;
+    top:285px;
+    left:2px;
+  }
