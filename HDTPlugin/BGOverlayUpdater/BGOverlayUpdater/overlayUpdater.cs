@@ -27,13 +27,19 @@ namespace BGOverlayUpdater
         static int sixth = 0;
         static int seventh = 0;
         static int eigth = 0;
-        static string mmrStart = "4,000";
+        static string mmrStart = "";
 
         internal static void InMenu()
         {
 
             //update rating in Menu after battlegrounds game
-            
+            if (mmrStart == "")
+            {
+                int ratingStart = Core.Game.CurrentGameStats.BattlegroundsRating;
+                mmrStart = ratingStart.ToString();
+                mmrStart = mmrStart.Substring(0, mmrStart.Length - 3) + "," + mmrStart.Substring(mmrStart.Length - 3, 3);
+            }
+
             int rating = Core.Game.CurrentGameStats.BattlegroundsRatingAfter;
             string ratingStr = rating.ToString();
             ratingStr = ratingStr.Substring(0, ratingStr.Length - 3) + "," + ratingStr.Substring(ratingStr.Length - 3, 3);
@@ -95,15 +101,29 @@ namespace BGOverlayUpdater
             File.WriteAllLines(path, lines);
         }
 
-    }
+
+        }
     public class overlayUpdaterPlugin : IPlugin
     {
 
         public void OnLoad()
         {
             // Triggered upon startup and when the user ticks the plugin on
-            //GameEvents.OnGameEnd.Add(overlayUpdater.GameEnd);
             GameEvents.OnInMenu.Add(overlayUpdater.InMenu);
+
+
+            var path = @"C:\Users\kupfe\OneDrive\Dokumente\GitHub\bgbrowsersource\scripts\main.js";
+            string[] lines = { "document.getElementById(\"MMRstart\").innerHTML = \"\";",
+                               "document.getElementById(\"MMRnow\").innerHTML = \"\";",
+                               "document.getElementById(\"first\").innerHTML = \"0\";",
+                               "document.getElementById(\"second\").innerHTML = \"0\";",
+                               "document.getElementById(\"third\").innerHTML = \"0\";",
+                               "document.getElementById(\"fourth\").innerHTML =\"0\";",
+                               "document.getElementById(\"fifth\").innerHTML = \"0\";",
+                               "document.getElementById(\"sixth\").innerHTML = \"0\";",
+                               "document.getElementById(\"seventh\").innerHTML = \"0\";",
+                               "document.getElementById(\"eigth\").innerHTML = \"0\";",};
+            File.WriteAllLines(path, lines);
         }
 
         public void OnUnload()
@@ -131,7 +151,7 @@ namespace BGOverlayUpdater
 
         public string Author => "TranRed";
 
-        public Version Version => new Version(0, 0, 1);
+        public Version Version => new Version(0, 5, 0);
 
         public MenuItem MenuItem => null;
     }
