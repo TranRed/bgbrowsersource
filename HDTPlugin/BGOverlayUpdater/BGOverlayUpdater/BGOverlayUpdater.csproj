@@ -31,6 +31,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HearthDb, Version=18.0.0.54613, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\AppData\Local\HearthstoneDeckTracker\app-1.13.1\HearthDb.dll</HintPath>
+    </Reference>
+    <Reference Include="HearthMirror, Version=18.0.0.54613, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\AppData\Local\HearthstoneDeckTracker\app-1.13.0\HearthMirror.dll</HintPath>
+    </Reference>
     <Reference Include="HearthstoneDeckTracker">
       <HintPath>..\..\..\..\..\..\..\AppData\Local\HearthstoneDeckTracker\app-1.13.1\HearthstoneDeckTracker.exe</HintPath>
     </Reference>
