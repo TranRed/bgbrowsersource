@@ -1,0 +1,5 @@
+# ignore debug builds
+*Debug*
+
+#ignore C# .suo file
+*.suo
