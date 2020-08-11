@@ -33,21 +33,25 @@ namespace BGOverlayUpdater
         {
 
             //update rating in Menu after battlegrounds game
+
             if (mmrStart == "")
             {
+                //starting MMR should be updated from menu already, but let's be safe in case I forget to start the tracker on time
                 int ratingStart = Core.Game.CurrentGameStats.BattlegroundsRating;
                 mmrStart = ratingStart.ToString();
                 mmrStart = mmrStart.Substring(0, mmrStart.Length - 3) + "," + mmrStart.Substring(mmrStart.Length - 3, 3);
             }
 
+            //MMR after the game
             int rating = Core.Game.CurrentGameStats.BattlegroundsRatingAfter;
             string ratingStr = rating.ToString();
             ratingStr = ratingStr.Substring(0, ratingStr.Length - 3) + "," + ratingStr.Substring(ratingStr.Length - 3, 3);
 
+            //snippet "borrowed" from boonwin: https://github.com/boonwin/BoonwinsBattlegroundsTracker 
             int playerId = Core.Game.Player.Id;
             Entity hero = Core.Game.Entities.Values.Where(x => x.IsHero && x.GetTag(GameTag.PLAYER_ID) == playerId).First();
-
             var placement = hero.GetTag(GameTag.PLAYER_LEADERBOARD_PLACE);
+
             switch (placement)
             {
                 case 1:
@@ -82,11 +86,36 @@ namespace BGOverlayUpdater
                     eigth = eigth + 1;
                     break;
             }
-            string placementStr = placement.ToString();
+  
+            _updateOverlay(ratingStr);
+        }
 
-            //experimental code to update the js
-            //path should be set in settings (somehow) and placements and MMR need to be read from result
-            //starting MMR to be set on startup
+        internal static void OnLoad()
+        {
+            //do an initial reset of stats (in case I load up HDT after starting the first game)
+            _updateOverlay("");
+        }
+
+            internal static void OnUpdate()
+        {
+            //only try to update MMR in Battlegrounds menu
+            if (Core.Game.CurrentMode == Hearthstone_Deck_Tracker.Enums.Hearthstone.Mode.BACON)
+            {
+                if (mmrStart == "")
+                {
+                    //@TO-DO: path should be set in settings
+                    int ratingStart = Core.Game.BattlegroundsRatingInfo.Rating;
+                    mmrStart = ratingStart.ToString();
+                    mmrStart = mmrStart.Substring(0, mmrStart.Length - 3) + "," + mmrStart.Substring(mmrStart.Length - 3, 3);
+
+                    _updateOverlay(mmrStart);
+                }
+            }
+        }
+
+        private static void _updateOverlay(string ratingStr)
+        {
+            //@TO-DO: path should be set in settings
             var path = @"C:\Users\kupfe\OneDrive\Dokumente\GitHub\bgbrowsersource\scripts\main.js";
             string[] lines = { "document.getElementById(\"MMRstart\").innerHTML = \""+ mmrStart +"\";",
                                "document.getElementById(\"MMRnow\").innerHTML = \""+ ratingStr +"\";",
@@ -101,8 +130,7 @@ namespace BGOverlayUpdater
             File.WriteAllLines(path, lines);
         }
 
-
-        }
+    }
     public class overlayUpdaterPlugin : IPlugin
     {
 
@@ -111,19 +139,8 @@ namespace BGOverlayUpdater
             // Triggered upon startup and when the user ticks the plugin on
             GameEvents.OnInMenu.Add(overlayUpdater.InMenu);
 
+            overlayUpdater.OnLoad();
 
-            var path = @"C:\Users\kupfe\OneDrive\Dokumente\GitHub\bgbrowsersource\scripts\main.js";
-            string[] lines = { "document.getElementById(\"MMRstart\").innerHTML = \"\";",
-                               "document.getElementById(\"MMRnow\").innerHTML = \"\";",
-                               "document.getElementById(\"first\").innerHTML = \"0\";",
-                               "document.getElementById(\"second\").innerHTML = \"0\";",
-                               "document.getElementById(\"third\").innerHTML = \"0\";",
-                               "document.getElementById(\"fourth\").innerHTML =\"0\";",
-                               "document.getElementById(\"fifth\").innerHTML = \"0\";",
-                               "document.getElementById(\"sixth\").innerHTML = \"0\";",
-                               "document.getElementById(\"seventh\").innerHTML = \"0\";",
-                               "document.getElementById(\"eigth\").innerHTML = \"0\";",};
-            File.WriteAllLines(path, lines);
         }
 
         public void OnUnload()
@@ -139,7 +156,8 @@ namespace BGOverlayUpdater
 
         public void OnUpdate()
         {
-            // called every ~100ms
+            //called every ~100ms
+            overlayUpdater.OnUpdate();
         }
 
 
