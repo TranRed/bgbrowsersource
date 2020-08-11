@@ -6,6 +6,9 @@ using Hearthstone_Deck_Tracker.Plugins;
 using Hearthstone_Deck_Tracker.API;
 using Hearthstone_Deck_Tracker.Hearthstone.Entities;
 using HearthDb.Enums;
+using Newtonsoft.Json;
+using MahApps.Metro.Controls;
+using MahApps.Metro;
 
 namespace BGOverlayUpdater
 {
@@ -20,6 +23,8 @@ namespace BGOverlayUpdater
         static int seventh = 0;
         static int eigth = 0;
         static string mmrStart = "";
+        static string mmrNow ="";
+        private static Settings _settings;
 
         internal static void InMenu()
         {
@@ -32,12 +37,14 @@ namespace BGOverlayUpdater
                 int ratingStart = Core.Game.CurrentGameStats.BattlegroundsRating;
                 mmrStart = ratingStart.ToString();
                 mmrStart = mmrStart.Substring(0, mmrStart.Length - 3) + "," + mmrStart.Substring(mmrStart.Length - 3, 3);
+                mmrNow = mmrStart;
             }
 
             //MMR after the game
             int rating = Core.Game.CurrentGameStats.BattlegroundsRatingAfter;
             string ratingStr = rating.ToString();
             ratingStr = ratingStr.Substring(0, ratingStr.Length - 3) + "," + ratingStr.Substring(ratingStr.Length - 3, 3);
+            mmrNow = ratingStr;
 
             //snippet "borrowed" from boonwin: https://github.com/boonwin/BoonwinsBattlegroundsTracker 
             int playerId = Core.Game.Player.Id;
@@ -79,13 +86,14 @@ namespace BGOverlayUpdater
                     break;
             }
   
-            _updateOverlay(ratingStr);
+            _updateOverlay();
         }
 
-        internal static void OnLoad()
+        internal static void OnLoad(Settings settings)
         {
             //do an initial reset of stats (in case I load up HDT after starting the first game)
-            _updateOverlay("");
+            _settings = settings;
+            _updateOverlay();
         }
 
             internal static void OnUpdate()
@@ -95,43 +103,73 @@ namespace BGOverlayUpdater
             {
                 if (mmrStart == "")
                 {
-                    //@TO-DO: path should be set in settings
                     int ratingStart = Core.Game.BattlegroundsRatingInfo.Rating;
                     mmrStart = ratingStart.ToString();
                     mmrStart = mmrStart.Substring(0, mmrStart.Length - 3) + "," + mmrStart.Substring(mmrStart.Length - 3, 3);
-
-                    _updateOverlay(mmrStart);
+                    mmrNow = mmrStart;
+                    _updateOverlay();
                 }
             }
         }
 
-        private static void _updateOverlay(string ratingStr)
+        private static void _updateOverlay()
         {
-            //@TO-DO: path should be set in settings
-            var path = @"C:\Users\kupfe\OneDrive\Dokumente\GitHub\bgbrowsersource\scripts\main.js";
-            string[] lines = { "document.getElementById(\"MMRstart\").innerHTML = \""+ mmrStart +"\";",
-                               "document.getElementById(\"MMRnow\").innerHTML = \""+ ratingStr +"\";",
-                               "document.getElementById(\"first\").innerHTML = \""+ first.ToString() +"\";",
-                               "document.getElementById(\"second\").innerHTML = \""+ second.ToString() +"\";",
-                               "document.getElementById(\"third\").innerHTML = \""+ third.ToString() +"\";",
-                               "document.getElementById(\"fourth\").innerHTML = \""+ fourth.ToString() +"\";",
-                               "document.getElementById(\"fifth\").innerHTML = \""+ fifth.ToString() +"\";",
-                               "document.getElementById(\"sixth\").innerHTML = \""+ sixth.ToString() +"\";",
-                               "document.getElementById(\"seventh\").innerHTML = \""+ seventh.ToString() +"\";",
-                               "document.getElementById(\"eigth\").innerHTML = \""+ eigth.ToString() +"\";",};
-            File.WriteAllLines(path, lines);
+            var path = _settings.jsFileLocation;
+            
+            if (path != "")
+            {
+                string[] lines = { "document.getElementById(\"MMRstart\").innerHTML = \""+ mmrStart +"\";",
+                                   "document.getElementById(\"MMRnow\").innerHTML = \""+ mmrNow +"\";",
+                                   "document.getElementById(\"first\").innerHTML = \""+ first.ToString() +"\";",
+                                   "document.getElementById(\"second\").innerHTML = \""+ second.ToString() +"\";",
+                                   "document.getElementById(\"third\").innerHTML = \""+ third.ToString() +"\";",
+                                   "document.getElementById(\"fourth\").innerHTML = \""+ fourth.ToString() +"\";",
+                                   "document.getElementById(\"fifth\").innerHTML = \""+ fifth.ToString() +"\";",
+                                   "document.getElementById(\"sixth\").innerHTML = \""+ sixth.ToString() +"\";",
+                                   "document.getElementById(\"seventh\").innerHTML = \""+ seventh.ToString() +"\";",
+                                   "document.getElementById(\"eigth\").innerHTML = \""+ eigth.ToString() +"\";",};
+                File.WriteAllLines(path, lines);
+            }
         }
+
 
     }
     public class overlayUpdaterPlugin : IPlugin
     {
-
+        private Settings settings;
+        private Flyout _settingsFlyout;
+        private SettingsControl _settingsControl;
         public void OnLoad()
         {
             // Triggered upon startup and when the user ticks the plugin on
             GameEvents.OnInMenu.Add(overlayUpdater.InMenu);
 
-            overlayUpdater.OnLoad();
+            try
+            {
+                settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Settings._configLocation));
+            }
+            catch
+            {
+                settings = new Settings();
+                settings.save();
+            }
+
+            overlayUpdater.OnLoad(settings);
+
+            // create settings flyout
+            _settingsFlyout = new Flyout();
+            _settingsFlyout.Name = "BgSettingsFlyout";
+            _settingsFlyout.Position = Position.Left;
+            Panel.SetZIndex(_settingsFlyout, 100);
+            _settingsFlyout.Header = "BG Overlay Update Settings";
+            _settingsControl = new SettingsControl(settings);
+            _settingsFlyout.Content = _settingsControl;
+            _settingsFlyout.ClosingFinished += (sender, args) =>
+            {
+                settings.jsFileLocation = _settingsControl.jsFileLocation.Text;
+                settings.save();
+            };
+            Core.MainWindow.Flyouts.Items.Add(_settingsFlyout);
 
         }
 
@@ -144,6 +182,7 @@ namespace BGOverlayUpdater
         public void OnButtonPress()
         {
             // Triggered when the user clicks your button in the plugin list
+            _settingsFlyout.IsOpen = true;
         }
 
         public void OnUpdate()
@@ -157,12 +196,28 @@ namespace BGOverlayUpdater
 
         public string Description => "Updates my lidl BG overlay";
 
-        public string ButtonText => "BUTTON TEXT";
+        public string ButtonText => "Settings";
 
         public string Author => "TranRed";
 
-        public Version Version => new Version(0, 5, 0);
+        public Version Version => new Version(0, 7, 0);
 
         public MenuItem MenuItem => null;
+    }
+
+    public class Settings
+    {
+        public static readonly string _configLocation = Hearthstone_Deck_Tracker.Config.AppDataPath + @"\Plugins\BGOVerlayUpdater\BGOverlayUpdater.config";
+
+        //filepath for .js file
+        //leave empty for now (until I have a good idea about possible distribution)
+        //must be set to work
+        public string jsFileLocation = Hearthstone_Deck_Tracker.Config.AppDataPath + @"\Plugins\BGOVerlayUpdater\scripts\main.js";
+
+        public void save()
+        {
+            File.WriteAllText(_configLocation, JsonConvert.SerializeObject(this, Formatting.Indented));
+        }
+
     }
 }
