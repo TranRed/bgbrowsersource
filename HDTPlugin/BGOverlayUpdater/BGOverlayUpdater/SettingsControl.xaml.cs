@@ -22,7 +22,7 @@ namespace BGOverlayUpdater
 
         void resetClicked(object sender, RoutedEventArgs e)
         {
-            overlayUpdater.resetSession();
+            OverlayUpdater.resetSession();
         }
 
         void fileDialogClicked(object sender, RoutedEventArgs e)

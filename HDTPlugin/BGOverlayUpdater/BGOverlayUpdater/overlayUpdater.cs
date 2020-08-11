@@ -1,18 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Windows.Controls;
+﻿using System.Linq;
 using System.IO;
-using Hearthstone_Deck_Tracker.Plugins;
 using Hearthstone_Deck_Tracker.API;
 using Hearthstone_Deck_Tracker.Hearthstone.Entities;
 using HearthDb.Enums;
 using Newtonsoft.Json;
-using MahApps.Metro.Controls;
-using MahApps.Metro;
+
 
 namespace BGOverlayUpdater
 {
-    public class overlayUpdater
+    public class OverlayUpdater
     {
         static int first = 0;
         static int second = 0;
@@ -149,92 +145,6 @@ namespace BGOverlayUpdater
             }
         }
 
-
-    }
-    public class overlayUpdaterPlugin : IPlugin
-    {
-        private Settings settings;
-        private Flyout _settingsFlyout;
-        private SettingsControl _settingsControl;
-        public void OnLoad()
-        {
-            // Triggered upon startup and when the user ticks the plugin on
-            GameEvents.OnInMenu.Add(overlayUpdater.InMenu);
-
-            try
-            {
-                settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Settings._configLocation));
-            }
-            catch
-            {
-                settings = new Settings();
-                settings.save();
-            }
-
-            overlayUpdater.OnLoad(settings);
-
-            // create settings flyout
-            _settingsFlyout = new Flyout();
-            _settingsFlyout.Name = "BgSettingsFlyout";
-            _settingsFlyout.Position = Position.Left;
-            Panel.SetZIndex(_settingsFlyout, 100);
-            _settingsFlyout.Header = "BG Overlay Update Settings";
-            _settingsControl = new SettingsControl(settings);
-            _settingsFlyout.Content = _settingsControl;
-            _settingsFlyout.ClosingFinished += (sender, args) =>
-            {
-                settings.jsFileLocation = _settingsControl.jsFileLocation.Text;
-                settings.save();
-            };
-            Core.MainWindow.Flyouts.Items.Add(_settingsFlyout);
-
-        }
-
-        public void OnUnload()
-        {
-            // Triggered when the user unticks the plugin, however, HDT does not completely unload the plugin.
-            // see https://git.io/vxEcH
-        }
-
-        public void OnButtonPress()
-        {
-            // Triggered when the user clicks your button in the plugin list
-            _settingsFlyout.IsOpen = true;
-        }
-
-        public void OnUpdate()
-        {
-            //called every ~100ms
-            overlayUpdater.OnUpdate();
-        }
-
-
-        public string Name => "OBS Overlay Updater";
-
-        public string Description => "Updates my lidl BG overlay";
-
-        public string ButtonText => "Settings";
-
-        public string Author => "TranRed";
-
-        public Version Version => new Version(0, 7, 0);
-
-        public MenuItem MenuItem => null;
-    }
-
-    public class Settings
-    {
-        public static readonly string _configLocation = Hearthstone_Deck_Tracker.Config.AppDataPath + @"\Plugins\BGOVerlayUpdater\BGOverlayUpdater.config";
-
-        //filepath for .js file
-        //leave empty for now (until I have a good idea about possible distribution)
-        //must be set to work
-        public string jsFileLocation = Hearthstone_Deck_Tracker.Config.AppDataPath + @"\Plugins\BGOVerlayUpdater\scripts\main.js";
-
-        public void save()
-        {
-            File.WriteAllText(_configLocation, JsonConvert.SerializeObject(this, Formatting.Indented));
-        }
 
     }
 }
