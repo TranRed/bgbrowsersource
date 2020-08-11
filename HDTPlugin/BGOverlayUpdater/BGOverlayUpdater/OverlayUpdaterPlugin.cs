@@ -14,6 +14,7 @@ namespace BGOverlayUpdater
         private Settings settings;
         private Flyout _settingsFlyout;
         private SettingsControl _settingsControl;
+
         public void OnLoad()
         {
             // Triggered upon startup and when the user ticks the plugin on
@@ -30,21 +31,7 @@ namespace BGOverlayUpdater
             }
 
             OverlayUpdater.OnLoad(settings);
-
-            // create settings flyout
-            _settingsFlyout = new Flyout();
-            _settingsFlyout.Name = "BgSettingsFlyout";
-            _settingsFlyout.Position = Position.Left;
-            Panel.SetZIndex(_settingsFlyout, 100);
-            _settingsFlyout.Header = "BG Overlay Update Settings";
-            _settingsControl = new SettingsControl(settings);
-            _settingsFlyout.Content = _settingsControl;
-            _settingsFlyout.ClosingFinished += (sender, args) =>
-            {
-                settings.jsFileLocation = _settingsControl.jsFileLocation.Text;
-                settings.save();
-            };
-            Core.MainWindow.Flyouts.Items.Add(_settingsFlyout);
+            createSettingsFlyout(settings);
 
         }
 
@@ -66,6 +53,24 @@ namespace BGOverlayUpdater
             OverlayUpdater.OnUpdate();
         }
 
+        private void createSettingsFlyout(Settings settings)
+        {
+            _settingsFlyout = new Flyout();
+            _settingsFlyout.Name = "BgSettingsFlyout";
+            _settingsFlyout.Position = Position.Left;
+            Panel.SetZIndex(_settingsFlyout, 100);
+            _settingsFlyout.Header = "BG Overlay Update Settings";
+            _settingsControl = new SettingsControl(settings);
+            _settingsFlyout.Content = _settingsControl;
+
+            _settingsFlyout.ClosingFinished += (sender, args) =>
+            {
+                settings.jsFileLocation = _settingsControl.jsFileLocation.Text;
+                settings.save();
+            };
+
+            Core.MainWindow.Flyouts.Items.Add(_settingsFlyout);
+        }
 
         public string Name => "OBS Overlay Updater";
 
@@ -76,7 +81,6 @@ namespace BGOverlayUpdater
         public string Author => "TranRed";
 
         public Version Version => new Version(0, 7, 0);
-
         public MenuItem MenuItem => null;
     }
 }

@@ -26,7 +26,6 @@ namespace BGOverlayUpdater
         {
 
             //update rating in Menu after battlegrounds game
-
             if (mmrStart == "")
             {
                 //starting MMR should be updated from menu already, but let's be safe in case I forget to start the tracker on time
@@ -42,7 +41,7 @@ namespace BGOverlayUpdater
             ratingStr = ratingStr.Substring(0, ratingStr.Length - 3) + "," + ratingStr.Substring(ratingStr.Length - 3, 3);
             mmrNow = ratingStr;
 
-            //snippet "borrowed" from boonwin: https://github.com/boonwin/BoonwinsBattlegroundsTracker 
+            //identify player and then their placement
             int playerId = Core.Game.Player.Id;
             Entity hero = Core.Game.Entities.Values.Where(x => x.IsHero && x.GetTag(GameTag.PLAYER_ID) == playerId).First();
             var placement = hero.GetTag(GameTag.PLAYER_LEADERBOARD_PLACE);
@@ -87,7 +86,6 @@ namespace BGOverlayUpdater
 
         internal static void OnLoad(Settings settings)
         {
-            //do an initial reset of stats (in case I load up HDT after starting the first game)
             _settings = settings;
             _updateOverlay();
         }
