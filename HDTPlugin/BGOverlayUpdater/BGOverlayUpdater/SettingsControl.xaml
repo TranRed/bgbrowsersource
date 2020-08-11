@@ -12,5 +12,9 @@
             <Label Content=".js File Location" FontSize="16"></Label>
             <TextBox Name="jsFileLocation" Text="Label 1" FontSize="16"  VerticalAlignment="Center"  Width="500" TextWrapping="Wrap" HorizontalAlignment="Right"></TextBox>
         </DockPanel>
+        <DockPanel Margin="0">
+            <Button Width="100" Click="resetClicked">reset session</Button>
+        </DockPanel>
     </StackPanel>
+
 </UserControl>

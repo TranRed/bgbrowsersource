@@ -1,11 +1,10 @@
+using System.Windows;
 using System.Windows.Controls;
 
 namespace BGOverlayUpdater
 {
     public partial class SettingsControl : UserControl
     {
-
-        private Settings _settings;
 
         public SettingsControl(Settings settings)
         {
@@ -16,6 +15,11 @@ namespace BGOverlayUpdater
         public void UpdateSettings(Settings settings)
         {
             jsFileLocation.Text = settings.jsFileLocation;
+        }
+
+        void resetClicked(object sender, RoutedEventArgs e)
+        {
+            overlayUpdater.resetSession();
         }
 
     }

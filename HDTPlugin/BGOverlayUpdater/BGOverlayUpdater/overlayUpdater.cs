@@ -96,7 +96,7 @@ namespace BGOverlayUpdater
             _updateOverlay();
         }
 
-            internal static void OnUpdate()
+        internal static void OnUpdate()
         {
             //only try to update MMR in Battlegrounds menu
             if (Core.Game.CurrentMode == Hearthstone_Deck_Tracker.Enums.Hearthstone.Mode.BACON)
@@ -110,6 +110,23 @@ namespace BGOverlayUpdater
                     _updateOverlay();
                 }
             }
+        }
+
+        internal static void resetSession()
+        {
+            //reset session stats on button click
+            mmrStart = "";
+            mmrNow = "";
+            first = 0;
+            second = 0;
+            third = 0;
+            fourth = 0;
+            fifth = 0;
+            sixth = 0;
+            seventh = 0;
+            eigth = 0;
+
+            _updateOverlay();
         }
 
         private static void _updateOverlay()
