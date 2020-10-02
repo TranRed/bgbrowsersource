@@ -31,14 +31,18 @@ namespace BGOverlayUpdater
                 //starting MMR should be updated from menu already, but let's be safe in case I forget to start the tracker on time
                 int ratingStart = Core.Game.CurrentGameStats.BattlegroundsRating;
                 mmrStart = ratingStart.ToString();
-                mmrStart = mmrStart.Substring(0, mmrStart.Length - 3) + "," + mmrStart.Substring(mmrStart.Length - 3, 3);
+                if(mmrStart.Length > 3){
+                    mmrStart = mmrStart.Substring(0, mmrStart.Length - 3) + "," + mmrStart.Substring(mmrStart.Length - 3, 3);
+                }
                 mmrNow = mmrStart;
             }
 
             //MMR after the game
             int rating = Core.Game.CurrentGameStats.BattlegroundsRatingAfter;
             string ratingStr = rating.ToString();
-            ratingStr = ratingStr.Substring(0, ratingStr.Length - 3) + "," + ratingStr.Substring(ratingStr.Length - 3, 3);
+            if(ratingStr.Length > 3){
+                ratingStr = ratingStr.Substring(0, ratingStr.Length - 3) + "," + ratingStr.Substring(ratingStr.Length - 3, 3);
+            }
             mmrNow = ratingStr;
 
             //identify player and then their placement
@@ -99,7 +103,9 @@ namespace BGOverlayUpdater
                 {
                     int ratingStart = Core.Game.BattlegroundsRatingInfo.Rating;
                     mmrStart = ratingStart.ToString();
-                    mmrStart = mmrStart.Substring(0, mmrStart.Length - 3) + "," + mmrStart.Substring(mmrStart.Length - 3, 3);
+                    if(mmrStart.Length > 3){
+                        mmrStart = mmrStart.Substring(0, mmrStart.Length - 3) + "," + mmrStart.Substring(mmrStart.Length - 3, 3);
+                    }
                     mmrNow = mmrStart;
                     _updateOverlay();
                 }
