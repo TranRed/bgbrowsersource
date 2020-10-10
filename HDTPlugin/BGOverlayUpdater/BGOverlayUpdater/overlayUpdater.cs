@@ -37,6 +37,11 @@ namespace BGOverlayUpdater
                 mmrNow = mmrStart;
             }
 
+            if(Core.Game.Spectator == true)
+            {
+                return;
+            }
+
             //MMR after the game
             int rating = Core.Game.CurrentGameStats.BattlegroundsRatingAfter;
             string ratingStr = rating.ToString();
