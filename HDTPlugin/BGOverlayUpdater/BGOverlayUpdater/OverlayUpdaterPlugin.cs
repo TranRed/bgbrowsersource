@@ -19,6 +19,7 @@ namespace BGOverlayUpdater
         {
             // Triggered upon startup and when the user ticks the plugin on
             GameEvents.OnInMenu.Add(OverlayUpdater.InMenu);
+            GameEvents.OnGameEnd.Add(OverlayUpdater.OnGameEnd);
 
             try
             {
@@ -51,6 +52,11 @@ namespace BGOverlayUpdater
         {
             //called every ~100ms
             OverlayUpdater.OnUpdate();
+        }
+
+        public void OnGameEnd()
+        {
+            OverlayUpdater.OnGameEnd();
         }
 
         private void createSettingsFlyout(Settings settings)

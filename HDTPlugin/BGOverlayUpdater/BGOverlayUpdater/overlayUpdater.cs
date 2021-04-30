@@ -10,6 +10,7 @@ namespace BGOverlayUpdater
 {
     public class OverlayUpdater
     {
+        static bool gameJustEnded = false;
         static int first = 0;
         static int second = 0;
         static int third = 0;
@@ -42,54 +43,58 @@ namespace BGOverlayUpdater
                 return;
             }
 
-            //MMR after the game
-            int rating = Core.Game.CurrentGameStats.BattlegroundsRatingAfter;
-            string ratingStr = rating.ToString();
-            if(ratingStr.Length > 3){
-                ratingStr = ratingStr.Substring(0, ratingStr.Length - 3) + "," + ratingStr.Substring(ratingStr.Length - 3, 3);
+            if (gameJustEnded) { 
+                //MMR after the game
+                int rating = Core.Game.CurrentGameStats.BattlegroundsRatingAfter;
+                string ratingStr = rating.ToString();
+                if(ratingStr.Length > 3){
+                    ratingStr = ratingStr.Substring(0, ratingStr.Length - 3) + "," + ratingStr.Substring(ratingStr.Length - 3, 3);
+                }
+                mmrNow = ratingStr;
+
+                //identify player and then their placement
+                int playerId = Core.Game.Player.Id;
+                Entity hero = Core.Game.Entities.Values.Where(x => x.IsHero && x.GetTag(GameTag.PLAYER_ID) == playerId).First();
+                var placement = hero.GetTag(GameTag.PLAYER_LEADERBOARD_PLACE);
+
+                switch (placement)
+                {
+                    case 1:
+                        first = first + 1;
+                        break;
+
+                    case 2:
+                        second = second + 1;
+                        break;
+
+                    case 3:
+                        third = third + 1;
+                        break;
+
+                    case 4:
+                        fourth = fourth + 1;
+                        break;
+
+                    case 5:
+                        fifth = fifth + 1;
+                        break;
+
+                    case 6:
+                        sixth = sixth + 1;
+                        break;
+
+                    case 7:
+                        seventh = seventh + 1;
+                        break;
+
+                    case 8:
+                        eigth = eigth + 1;
+                        break;
+                }
+
+                gameJustEnded = false;
             }
-            mmrNow = ratingStr;
 
-            //identify player and then their placement
-            int playerId = Core.Game.Player.Id;
-            Entity hero = Core.Game.Entities.Values.Where(x => x.IsHero && x.GetTag(GameTag.PLAYER_ID) == playerId).First();
-            var placement = hero.GetTag(GameTag.PLAYER_LEADERBOARD_PLACE);
-
-            switch (placement)
-            {
-                case 1:
-                    first = first + 1;
-                    break;
-
-                case 2:
-                    second = second + 1;
-                    break;
-
-                case 3:
-                    third = third + 1;
-                    break;
-
-                case 4:
-                    fourth = fourth + 1;
-                    break;
-
-                case 5:
-                    fifth = fifth + 1;
-                    break;
-
-                case 6:
-                    sixth = sixth + 1;
-                    break;
-
-                case 7:
-                    seventh = seventh + 1;
-                    break;
-
-                case 8:
-                    eigth = eigth + 1;
-                    break;
-            }
-  
             _updateOverlay();
         }
 
@@ -115,6 +120,11 @@ namespace BGOverlayUpdater
                     _updateOverlay();
                 }
             }
+        }
+
+        internal static void OnGameEnd()
+        {
+            gameJustEnded = true;
         }
 
         internal static void resetSession()
